@@ -45,3 +45,7 @@ spec:
           value: SEED_IP_DUMMY
         - name: MON_IPS
           value: MON_IPS_DUMMY
+        - name: REPO_ORG
+          value: hydro-project
+        - name: REPO_BRANCH
+          value: master

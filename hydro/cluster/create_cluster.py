@@ -35,45 +35,45 @@ def create_cluster(mem_count, ebs_count, func_count, sched_count, route_count,
                          + 'located.')
     prefix = os.path.join(os.environ['HYDRO_HOME'], 'cluster/hydro/cluster')
 
-    util.run_process(['./create_cluster_object.sh', cluster_name, kops_bucket,
-                      ssh_key])
+    util.run_process(['./create_cluster_object.sh', kops_bucket, ssh_key])
 
     client, apps_client = util.init_k8s()
 
     print('Creating management pods...')
-    kops_spec = util.load_yaml('yaml/pods/kops-pod.yml', prefix)
-    env = kops_spec['spec']['containers'][0]['env']
+    management_spec = util.load_yaml('yaml/pods/management-pod.yml', prefix)
+    env = management_spec['spec']['containers'][0]['env']
 
     util.replace_yaml_val(env, 'AWS_ACCESS_KEY_ID', aws_key_id)
     util.replace_yaml_val(env, 'AWS_SECRET_ACCESS_KEY', aws_key)
     util.replace_yaml_val(env, 'KOPS_STATE_STORE', kops_bucket)
     util.replace_yaml_val(env, 'HYDRO_CLUSTER_NAME', cluster_name)
 
-    client.create_namespaced_pod(namespace=util.NAMESPACE, body=kops_spec)
+    client.create_namespaced_pod(namespace=util.NAMESPACE, body=management_spec)
 
-    # Waits until the kops pod starts to move forward -- we need to do this
-    # because other pods depend on knowing the kops pod's IP address.
-    kops_ip = util.get_pod_ips(client, 'role=kops', is_running=True)[0]
+    # Waits until the management pod starts to move forward -- we need to do
+    # this because other pods depend on knowing the management pod's IP address.
+    management_ip = util.get_pod_ips(client, 'role=management', is_running=True)[0]
 
-    # Copy kube config file to kops pod, so it can execute kubectl commands, in
-    # addition to SSH keys and KVS config.
-    kops_podname = kops_spec['metadata']['name']
-    kcname = kops_spec['spec']['containers'][0]['name']
+    # Copy kube config file to management pod, so it can execute kubectl
+    # commands, in addition to SSH keys and KVS config.
+    management_podname = management_spec['metadata']['name']
+    kcname = management_spec['spec']['containers'][0]['name']
 
     os.system('cp %s anna-config.yml' % cfile)
     kubecfg = os.path.join(os.environ['HOME'], '.kube/config')
-    util.copy_file_to_pod(client, kubecfg, kops_podname, '/root/.kube/',
+    util.copy_file_to_pod(client, kubecfg, management_podname, '/root/.kube/',
                           kcname)
-    util.copy_file_to_pod(client, ssh_key, kops_podname, '/root/.ssh/', kcname)
-    util.copy_file_to_pod(client, ssh_key + '.pub', kops_podname,
+    util.copy_file_to_pod(client, ssh_key, management_podname, '/root/.ssh/',
+                          kcname)
+    util.copy_file_to_pod(client, ssh_key + '.pub', management_podname,
                           '/root/.ssh/', kcname)
-    util.copy_file_to_pod(client, 'anna-config.yml', kops_podname,
+    util.copy_file_to_pod(client, 'anna-config.yml', management_podname,
                           '/hydro/anna/conf/', kcname)
 
     # Start the monitoring pod.
     mon_spec = util.load_yaml('yaml/pods/monitoring-pod.yml', prefix)
     util.replace_yaml_val(mon_spec['spec']['containers'][0]['env'], 'MGMT_IP',
-                          kops_ip)
+                          management_ip)
     client.create_namespaced_pod(namespace=util.NAMESPACE, body=mon_spec)
 
     # Wait until the monitoring pod is finished creating to get its IP address
@@ -120,7 +120,7 @@ def create_cluster(mem_count, ebs_count, func_count, sched_count, route_count,
 
     print('Finished creating all pods...')
     os.system('touch setup_complete')
-    util.copy_file_to_pod(client, 'setup_complete', kops_podname, '/hydro',
+    util.copy_file_to_pod(client, 'setup_complete', management_podname, '/hydro',
                           kcname)
     os.system('rm setup_complete')
 

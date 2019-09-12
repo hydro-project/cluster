@@ -293,9 +293,12 @@ def check_hash_ring(client, context):
     else:
         # If there are two tiers, we need to make sure that we assign the
         # correct tiers as the memory and EBS tiers, respectively.
-        mem_tier, ebs_tier = (tiers[0], tiers[1]
-                              if tiers[0].tier_id == MEMORY
-                              else tiers[1], tiers[0])
+        if tiers[0].tier_id == MEMORY:
+            mem_tier = tiers[0]
+            ebs_tier = tiers[1]
+        else:
+            mem_tier = tiers[1]
+            ebs_tier = tiers[0]
 
     # Queries the Kubernetes master for the list of memory nodes its aware of
     # -- if any of the nodes in the hash ring aren't currently running, we add

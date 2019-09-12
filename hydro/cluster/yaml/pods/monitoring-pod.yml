@@ -27,5 +27,9 @@ spec:
       value: mn
     - name: MGMT_IP
       value: MGMT_IP_DUMMY
+    - name: REPO_ORG
+      value: hydro-project
+    - name: REPO_BRANCH
+      value: master
   nodeSelector:
     role: general

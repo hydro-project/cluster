@@ -44,6 +44,10 @@ spec:
             value: MGMT_IP_DUMMY
           - name: MON_IPS
             value: MON_IPS_DUMMY
+          - name: REPO_ORG
+            value: hydro-project
+          - name: REPO_BRANCH
+            value: master
           volumeMounts:
           - mountPath: /ebs/ebs_0
             name: ebs0

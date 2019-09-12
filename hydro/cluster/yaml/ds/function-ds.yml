@@ -51,6 +51,10 @@ spec:
           value: "0"
         - name: ROLE
           value: executor
+        - name: REPO_ORG
+          value: hydro-project
+        - name: REPO_BRANCH
+          value: master
         volumeMounts:
         - mountPath: /requests
           name: ipc
@@ -68,6 +72,10 @@ spec:
           value: "1"
         - name: ROLE
           value: executor
+        - name: REPO_ORG
+          value: hydro-project
+        - name: REPO_BRANCH
+          value: master
         volumeMounts:
         - mountPath: /requests
           name: ipc
@@ -85,6 +93,10 @@ spec:
           value: "2"
         - name: ROLE
           value: executor
+        - name: REPO_ORG
+          value: hydro-project
+        - name: REPO_BRANCH
+          value: master
         volumeMounts:
         - mountPath: /requests
           name: ipc
@@ -96,6 +108,10 @@ spec:
           value: ROUTE_ADDR_DUMMY
         - name: MGMT_IP
           value: MGMT_IP_DUMMY
+        - name: REPO_ORG
+          value: hydro-project
+        - name: REPO_BRANCH
+          value: master
         volumeMounts:
         - mountPath: /requests
           name: ipc

@@ -42,3 +42,7 @@ spec:
           value: MGMT_IP_DUMMY
         - name: ROLE
           value: scheduler
+        - name: REPO_ORG
+          value: hydro-project
+        - name: REPO_BRANCH
+          value: master

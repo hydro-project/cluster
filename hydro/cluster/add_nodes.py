@@ -36,7 +36,7 @@ def add_nodes(client, apps_client, cfile, kinds, counts, create=False,
 
     util.run_process(['./validate_cluster.sh'])
 
-    kops_ip = util.get_pod_ips(client, 'role=kops')[0]
+    management_ip = util.get_pod_ips(client, 'role=management')[0]
     route_ips = util.get_pod_ips(client, 'role=routing')
 
     if len(route_ips) > 0:
@@ -70,7 +70,7 @@ def add_nodes(client, apps_client, cfile, kinds, counts, create=False,
                 util.replace_yaml_val(env, 'SCHED_IPS', sched_str)
                 util.replace_yaml_val(env, 'FUNCTION_ADDR', function_addr)
                 util.replace_yaml_val(env, 'MON_IPS', mon_str)
-                util.replace_yaml_val(env, 'MGMT_IP', kops_ip)
+                util.replace_yaml_val(env, 'MGMT_IP', management_ip)
                 util.replace_yaml_val(env, 'SEED_IP', seed_ip)
 
             apps_client.create_namespaced_daemon_set(namespace=util.NAMESPACE,

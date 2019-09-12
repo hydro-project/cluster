@@ -15,24 +15,12 @@
 #  limitations under the License.
 
 if [[ -z "$1" ]] && [[ -z "$2" ]]; then
-  echo "Usage: ./create_cluster_object.sh cluster-name cluster-state-store <path-to-ssh-key>"
+  echo "Usage: ./create_cluster_object.sh cluster-state-store path-to-ssh-key"
   echo ""
   echo "Cluster name and S3 Bucket used as kops state store must be specified."
   echo "If no SSH key is specified, the default SSH key (~/.ssh/id_rsa) will be used."
 
   exit 1
-fi
-
-if [[ -z "$3" ]]; then
-  if [[ ! -f "~/.ssh/id_rsa" ]]; then
-    echo "No SSH key specified and default SSH key (~/.ssh/id_rsa) does not exist."
-
-    exit 1
-  fi
-
-  SSH_KEY=~/.ssh/id_rsa
-else
-  SSH_KEY=$3
 fi
 
 if [[ -z "$AWS_ACCESS_KEY_ID" ]] || [[ -z "$AWS_SECRET_ACCESS_KEY" ]]; then
@@ -42,8 +30,8 @@ if [[ -z "$AWS_ACCESS_KEY_ID" ]] || [[ -z "$AWS_SECRET_ACCESS_KEY" ]]; then
   exit 1
 fi
 
-FLUSTER_CLUSTER_NAME=$1
-KOPS_STATE_STORE=$2
+KOPS_STATE_STORE=$1
+SSH_KEY=$2
 
 echo "Creating cluster object..."
 kops create cluster --master-size c4.large --zones us-east-1a --ssh-public-key ${SSH_KEY}.pub ${HYDRO_CLUSTER_NAME} --networking kube-router > /dev/null 2>&1
