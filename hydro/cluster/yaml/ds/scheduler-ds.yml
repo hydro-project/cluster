@@ -33,7 +33,7 @@ spec:
       hostIPC: true
       containers:
       - name: scheduler-container
-        image: hydroproject/droplet
+        image: hydroproject/cloudburst
         imagePullPolicy: Always
         env:
         - name: ROUTE_ADDR

@@ -38,7 +38,7 @@ spec:
       hostIPC: true
       containers:
       - name: function-1
-        image: hydroproject/droplet
+        image: hydroproject/cloudburst
         imagePullPolicy: Always
         env:
         - name: ROUTE_ADDR
@@ -59,7 +59,7 @@ spec:
         - mountPath: /requests
           name: ipc
       - name: function-2
-        image: hydroproject/droplet
+        image: hydroproject/cloudburst
         imagePullPolicy: Always
         env:
         - name: ROUTE_ADDR
@@ -80,7 +80,7 @@ spec:
         - mountPath: /requests
           name: ipc
       - name: function-3
-        image: hydroproject/droplet
+        image: hydroproject/cloudburst
         imagePullPolicy: Always
         env:
         - name: ROUTE_ADDR

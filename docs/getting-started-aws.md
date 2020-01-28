@@ -20,7 +20,7 @@ cd $HYDRO_HOME
 git clone --recurse-submodules https://github.com/hydro-project/anna.git
 git clone --recurse-submodules https://github.com/hydro-project/anna-cache.git
 git clone --recurse-submodules https://github.com/hydro-project/cluster.git
-git clone --recurse-submodules https://github.com/hydro-project/droplet.git
+git clone --recurse-submodules https://github.com/hydro-project/cloudburst.git
 
 cd cluster
 ```
@@ -33,9 +33,9 @@ cd cluster
 
 ### Step 2: Configuring `kops`
 
-* `kops` requires an IAM group and user with permissions to access EC2, Route53, etc. You can find the commands to create these permissions [here](https://github.com/kubernetes/kops/blob/master/docs/aws.md#aws). Make sure that you capture the Access Key ID and Secret Access Key for the `kops` IAM user and set them as environmnent variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) and pass them into `aws configure`, as described in the above link.
-* `kops` also requires an S3 bucket for state storage. More information about configuring this bucket can be found [here](https://github.com/kubernetes/kops/blob/master/docs/aws.md#cluster-state-storage).
-* Finally, in order to access the cluster, you will need a domain name<sup>2</sup> to point to. Currently, we have only tested our setup scripts with domain names registered in Route53. `kops` supports a variety of DNS settings, which you can find more information about [here](https://github.com/kubernetes/kops/blob/master/docs/aws.md#configure-dns). If you would like help with running using other DNS settings and run into any challenges, please please [open an issue](https://github.com/hydro-project/cluster/issues/new), and we'd be happy to help debug.
+* `kops` requires an IAM group and user with permissions to access EC2, Route53, etc. You can find the commands to create these permissions [here](https://github.com/kubernetes/kops/blob/master/docs/getting_started/aws.md#aws). Make sure that you capture the Access Key ID and Secret Access Key for the `kops` IAM user and set them as environmnent variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) and pass them into `aws configure`, as described in the above link.
+* `kops` also requires an S3 bucket for state storage. More information about configuring this bucket can be found [here](https://github.com/kubernetes/kops/blob/master/docs/getting_started/aws.md#cluster-state-storage).
+* Finally, in order to access the cluster, you will need a domain name<sup>2</sup> to point to. Currently, we have only tested our setup scripts with domain names registered in Route53. `kops` supports a variety of DNS settings, which you can find more information about [here](https://github.com/kubernetes/kops/blob/master/docs/getting_started/aws.md#configure-dns). If you would like help with running using other DNS settings and run into any challenges, please please [open an issue](https://github.com/hydro-project/cluster/issues/new), and we'd be happy to help debug.
 
 ### Step 3: Odds and ends
 
@@ -45,7 +45,7 @@ cd cluster
 
 ### Step 4: Creating your first cluster
 
-You're now ready to create your first cluster. To start off, we'll create a tiny cluster, with one memory tier node and one routing node. From the `$HYDRO_HOME/cluster/` directory, run `python3 -m hydro.cluster.create_cluster -m 1 -r 1 -f 1 -s 1`. This will take about 10-15 minutes to run. Once it's finished, you will see the URL of two AWS [ELB](https://aws.amazon.com/elasticloadbalancing/)s, which can be used to interact with the Anna KVS and Droplet, respectively.
+You're now ready to create your first cluster. To start off, we'll create a tiny cluster, with one memory tier node and one routing node. From the `$HYDRO_HOME/cluster/` directory, run `python3 -m hydro.cluster.create_cluster -m 1 -r 1 -f 1 -s 1`. This will take about 10-15 minutes to run. Once it's finished, you will see the URL of two AWS [ELB](https://aws.amazon.com/elasticloadbalancing/)s, which can be used to interact with the Anna KVS and Cloudburst, respectively.
 
 <sup>1</sup> By default, the AWS CLI tool installs in `~/.local/bin` on Ubuntu. You will have to add this directory to your `$PATH`.
 

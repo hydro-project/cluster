@@ -31,7 +31,7 @@ spec:
         role: benchmark
       containers:
       - name: benchmark-1
-        image: hydroproject/droplet
+        image: hydroproject/cloudburst
         env: 
         - name: ROLE
           value: benchmark
@@ -46,7 +46,7 @@ spec:
         - name: REPO_BRANCH
           value: master
       - name: benchmark-2
-        image: hydroproject/droplet
+        image: hydroproject/cloudburst
         env: 
         - name: ROLE
           value: benchmark
@@ -61,7 +61,7 @@ spec:
         - name: REPO_BRANCH
           value: master
       - name: benchmark-3
-        image: hydroproject/droplet
+        image: hydroproject/cloudburst
         env: 
         - name: ROLE
           value: benchmark
@@ -76,7 +76,7 @@ spec:
         - name: REPO_BRANCH
           value: master
       - name: benchmark-4
-        image: hydroproject/droplet
+        image: hydroproject/cloudburst
         env: 
         - name: ROLE
           value: benchmark

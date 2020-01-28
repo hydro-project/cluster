@@ -33,6 +33,6 @@ protoc -I=common/proto --python_out=$HYDRO_HOME/cluster/hydro/shared/proto share
 cd $HYDRO_HOME/anna
 protoc -I=include/proto --python_out=$HYDRO_HOME/cluster/hydro/shared/proto metadata.proto
 
-# Compile the Protobufs to receive Droplet metadata.
-cd $HYDRO_HOME/droplet
+# Compile the Protobufs to receive Cloudburst metadata.
+cd $HYDRO_HOME/cloudburst
 protoc -I=proto --python_out=$HYDRO_HOME/cluster/hydro/shared/proto internal.proto

@@ -45,5 +45,7 @@ RUN git remote add origin https://github.com/$repo_org/cluster
 RUN git fetch origin && git checkout -b $build_branch origin/$source_branch
 WORKDIR /
 
+RUN pip3 install numpy
+
 COPY start-management.sh /
 CMD bash start-management.sh
