@@ -199,7 +199,7 @@ class DefaultHydroPolicy(BaseHydroPolicy):
                          (avg_utilization, len(executor_statuses), ip))
 
             for tid in range(NUM_EXEC_THREADS):
-                send_message(self.scaler.context, b'',
+                send_message(self.scaler.context, '',
                              get_executor_depart_address(ip, tid))
 
                 if (ip, tid) in executor_statuses:
