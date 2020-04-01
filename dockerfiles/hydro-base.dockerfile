@@ -46,7 +46,7 @@ RUN rm cmake-3.9.4-Linux-x86_64.tar.gz
 
 # Install python3.6. We use a separate apt repository because Ubuntu 14.04 does
 # not come with this version of Python3 enabled.
-RUN add-apt-repository -y ppa:jonathonf/python-3.6
+RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update
 RUN apt-get install -y python3.6
 RUN wget https://bootstrap.pypa.io/get-pip.py
