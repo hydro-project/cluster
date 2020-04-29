@@ -31,7 +31,11 @@ MONITORING_NOTIFY_PORT = 6600
 def send_message(context, message, address):
     socket = context.socket(zmq.PUSH)
     socket.connect(address)
-    socket.send_string(message)
+    
+    if type(message) == str:
+        socket.send_string(message)
+    else:
+        socket.send(message)
 
 
 def get_executor_depart_address(ip, tid):

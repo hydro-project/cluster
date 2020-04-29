@@ -21,8 +21,8 @@ metadata:
 spec:
   image: kope.io/k8s-1.11-debian-stretch-amd64-hvm-ebs-2018-08-17
   machineType: r4.2xlarge
-  maxSize: NUM_DUMMY
-  minSize: NUM_DUMMY
+  maxSize: MAX_DUMMY
+  minSize: MIN_DUMMY
   rootVolumeSize: 32
   role: Node
   nodeLabels:

@@ -14,6 +14,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+IP=`ifconfig eth0 | grep 'inet addr:' | grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1 }'`
+
 # Copies AWS environment variables for accessing the user's AWS account into
 # the ~/.aws/config file.
 mkdir -p ~/.aws
@@ -35,7 +37,10 @@ fi
 
 git remote remove origin
 git remote add origin https://github.com/$REPO_ORG/cluster
-git fetch -p origin
+while ! (git fetch -p origin)
+do
+  echo "git fetch failed, retrying"
+done
 git checkout -b brnch origin/$REPO_BRANCH
 
 # Generate compiled Python protobuf libraries from other Hydro project
@@ -49,4 +54,4 @@ git checkout -b brnch origin/$REPO_BRANCH
 cd $HYDRO_HOME/cluster
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 python3.6 hydro/management/k8s_server.py &
-python3.6 hydro/management/management_server.py
+python3.6 hydro/management/management_server.py $IP

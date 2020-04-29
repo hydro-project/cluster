@@ -40,7 +40,7 @@ class BaseScaler():
         '''
         raise NotImplementedError
 
-    def remove_vm(self, kind, ip):
+    def remove_vms(self, kind, ip):
         '''
         Removes a particular node (denoted by the the IP address ip) from the
         system; the support kinds are memory, ebs, and function.

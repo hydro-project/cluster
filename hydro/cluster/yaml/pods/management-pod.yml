@@ -36,5 +36,9 @@ spec:
       value: hydro-project
     - name: REPO_BRANCH
       value: master
+    - name: ANNA_REPO_ORG
+      value: hydro-project
+    - name: ANNA_REPO_BRANCH
+      value: master
   nodeSelector:
     role: general

@@ -42,7 +42,7 @@ def run():
     poller.register(node_add_socket, zmq.POLLIN)
     poller.register(node_remove_socket, zmq.POLLIN)
 
-    cfile = '/hydro/anna/conf/kvs-base.yml'
+    cfile = '/hydro/anna/conf/anna-config.yml'
 
     while True:
         socks = dict(poller.poll(timeout=1000))

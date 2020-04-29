@@ -45,6 +45,10 @@ spec:
           value: hydro-project
         - name: REPO_BRANCH
           value: master
+        - name: ANNA_REPO_ORG
+          value: hydro-project
+        - name: ANNA_REPO_BRANCH
+          value: master
       - name: benchmark-2
         image: hydroproject/cloudburst
         env: 
@@ -59,6 +63,10 @@ spec:
         - name: REPO_ORG
           value: hydro-project
         - name: REPO_BRANCH
+          value: master
+        - name: ANNA_REPO_ORG
+          value: hydro-project
+        - name: ANNA_REPO_BRANCH
           value: master
       - name: benchmark-3
         image: hydroproject/cloudburst
@@ -75,6 +83,10 @@ spec:
           value: hydro-project
         - name: REPO_BRANCH
           value: master
+        - name: ANNA_REPO_ORG
+          value: hydro-project
+        - name: ANNA_REPO_BRANCH
+          value: master
       - name: benchmark-4
         image: hydroproject/cloudburst
         env: 
@@ -89,4 +101,8 @@ spec:
         - name: REPO_ORG
           value: hydro-project
         - name: REPO_BRANCH
+          value: master
+        - name: ANNA_REPO_ORG
+          value: hydro-project
+        - name: ANNA_REPO_BRANCH
           value: master

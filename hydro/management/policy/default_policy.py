@@ -40,7 +40,7 @@ class DefaultHydroPolicy(BaseHydroPolicy):
         self.max_pin_count = max_pin_count
         self.max_latency_deviation = max_latency_deviation
         self.scale_increase = scale_increase
-        self.grace_period = 120
+        self.grace_period = grace_period
 
         self.latency_history = {}
         self.function_locations = {}
@@ -98,6 +98,8 @@ class DefaultHydroPolicy(BaseHydroPolicy):
             elif call_count < thruput * .1:
                 # Similarly, we check to see if the call count is significantly
                 # below the achieved throughput -- we then remove replicas.
+
+                # cgwu: sometimes the call count is misleading because we haven't gathered the count across all executors
                 decrease = math.ceil((call_count / thruput) * num_replicas) + 1
                 logging.info(('Function %s: %d calls in recent period under ' +
                               'threshold. Reducing to %d replicas.') %
@@ -151,7 +153,7 @@ class DefaultHydroPolicy(BaseHydroPolicy):
         avg_pinned_count = pinned_function_count / len(executor_statuses)
         num_nodes = len(executor_statuses) / NUM_EXEC_THREADS
 
-        logging.info(('There are currently %d executor nodes active in the' +
+        logging.info(('There are currently %d executor nodes active in the ' +
                      'system (%d threads).') % (num_nodes,
                                                 len(executor_statuses)))
         logging.info('Average executor utilization: %.4f' % (avg_utilization))
@@ -167,8 +169,7 @@ class DefaultHydroPolicy(BaseHydroPolicy):
                           + ' cluster.') % (avg_utilization,
                                             self.scale_increase))
 
-            if (len(executor_statuses) / NUM_EXEC_THREADS) < 5:
-                self.scaler.add_vms('function', self.scale_increase)
+            self.scaler.add_vms('function', self.scale_increase)
 
             # start the grace period after adding nodes
             self.grace_start = time.time()
@@ -206,3 +207,6 @@ class DefaultHydroPolicy(BaseHydroPolicy):
                     del executor_statuses[(ip, tid)]
 
             departing_executors[ip] = NUM_EXEC_THREADS
+
+            # start the grace period after removing nodes
+            self.grace_start = time.time()

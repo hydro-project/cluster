@@ -24,7 +24,8 @@ fi
 YML_FILE=yaml/igs/$1-ig.yml
 
 sed "s|CLUSTER_NAME|$HYDRO_CLUSTER_NAME|g" $YML_FILE > tmp.yml
-sed -i "s|NUM_DUMMY|$2|g" tmp.yml
+sed -i "s|MAX_DUMMY|$2|g" tmp.yml
+sed -i "s|MIN_DUMMY|$2|g" tmp.yml
 
 kops replace -f tmp.yml --force > /dev/null 2>&1
 rm tmp.yml

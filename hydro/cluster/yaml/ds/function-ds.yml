@@ -55,6 +55,10 @@ spec:
           value: hydro-project
         - name: REPO_BRANCH
           value: master
+        - name: ANNA_REPO_ORG
+          value: hydro-project
+        - name: ANNA_REPO_BRANCH
+          value: master
         volumeMounts:
         - mountPath: /requests
           name: ipc
@@ -76,6 +80,10 @@ spec:
           value: hydro-project
         - name: REPO_BRANCH
           value: master
+        - name: ANNA_REPO_ORG
+          value: hydro-project
+        - name: ANNA_REPO_BRANCH
+          value: master
         volumeMounts:
         - mountPath: /requests
           name: ipc
@@ -96,6 +104,10 @@ spec:
         - name: REPO_ORG
           value: hydro-project
         - name: REPO_BRANCH
+          value: master
+        - name: ANNA_REPO_ORG
+          value: hydro-project
+        - name: ANNA_REPO_BRANCH
           value: master
         volumeMounts:
         - mountPath: /requests

@@ -16,8 +16,11 @@ import logging
 import os
 import random
 import time
+import sys
 
 import zmq
+
+from anna.zmq_util import SocketCache
 
 from hydro.management.scaler.default_scaler import DefaultScaler
 from hydro.management.policy.default_policy import DefaultHydroPolicy
@@ -35,12 +38,16 @@ from hydro.shared.proto.metadata_pb2 import ClusterMembership, MEMORY
 
 REPORT_PERIOD = 5
 
+PIN_ACCEPT_PORT = '5010'
+
 logging.basicConfig(filename='log_management.txt', level=logging.INFO,
                     format='%(asctime)s %(message)s')
 
 
-def run():
+def run(self_ip):
     context = zmq.Context(1)
+
+    pusher_cache = SocketCache(context, zmq.PUSH)
 
     restart_pull_socket = context.socket(zmq.REP)
     restart_pull_socket.bind('tcp://*:7000')
@@ -48,7 +55,7 @@ def run():
     churn_pull_socket = context.socket(zmq.PULL)
     churn_pull_socket.bind('tcp://*:7001')
 
-    list_executors_socket = context.socket(zmq.REP)
+    list_executors_socket = context.socket(zmq.PULL)
     list_executors_socket.bind('tcp://*:7002')
 
     function_status_socket = context.socket(zmq.PULL)
@@ -62,6 +69,10 @@ def run():
 
     statistics_socket = context.socket(zmq.PULL)
     statistics_socket.bind('tcp://*:7006')
+
+    pin_accept_socket = context.socket(zmq.PULL)
+    pin_accept_socket.setsockopt(zmq.RCVTIMEO, 1000)
+    pin_accept_socket.bind('tcp://*:' + PIN_ACCEPT_PORT)
 
     poller = zmq.Poller()
     poller.register(restart_pull_socket, zmq.POLLIN)
@@ -80,7 +91,7 @@ def run():
 
     client, _ = util.init_k8s()
 
-    scaler = DefaultScaler(context, add_push_socket, remove_push_socket)
+    scaler = DefaultScaler(self_ip, context, add_push_socket, remove_push_socket, pin_accept_socket)
     policy = DefaultHydroPolicy(scaler)
 
     # Tracks the self-reported statuses of each executor thread in the system.
@@ -118,7 +129,7 @@ def run():
             if args[0] == 'add':
                 scaler.add_vms(args[2], args[1])
             elif args[0] == 'remove':
-                scaler.remove_vm(args[2], args[1])
+                scaler.remove_vms(args[2], args[1])
 
         if (restart_pull_socket in socks and socks[restart_pull_socket] ==
                 zmq.POLLIN):
@@ -134,13 +145,14 @@ def run():
                 zmq.POLLIN):
             # We can safely ignore this message's contents, and the response
             # does not depend on it.
-            list_executors_socket.recv()
+            response_ip = list_executors_socket.recv_string()
 
             ips = StringSet()
             for ip in util.get_pod_ips(client, 'role=function'):
                 ips.keys.append(ip)
 
-            list_executors_socket.send(ips.SerializeToString())
+            sckt = pusher_cache.get(response_ip)
+            sckt.send(ips.SerializeToString())
 
         if (function_status_socket in socks and
                 socks[function_status_socket] == zmq.POLLIN):
@@ -154,7 +166,7 @@ def run():
             # utilization to be skewed downwards. The reason we might still
             # receive this message is because the depart message may not have
             # arrived when this was sent.
-            if key in departing_executors:
+            if key[0] in departing_executors:
                 continue
 
             executor_statuses[key] = status
@@ -184,7 +196,8 @@ def run():
             # that they are ready to leave, and we then remove the VM from the
             # system.
             if departing_executors[ip] == 0:
-                scaler.remove_vm('function', ip)
+                logging.info('Removing node with ip %s' % ip)
+                scaler.remove_vms('function', ip)
                 del departing_executors[ip]
 
         if (statistics_socket in socks and
@@ -360,4 +373,4 @@ if __name__ == '__main__':
                                           '.kube/config')):
         pass
 
-    run()
+    run(sys.argv[1])
