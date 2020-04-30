@@ -96,8 +96,11 @@ def create_cluster(mem_count, ebs_count, func_count, sched_count, route_count,
 
     print('Creating routing service...')
     service_spec = util.load_yaml('yaml/services/routing.yml', prefix)
-    client.create_namespaced_service(namespace=util.NAMESPACE,
-                                     body=service_spec)
+    # Only create the routing service if it isn't up already
+    # (e.g. from a previous execution of the script).
+    if util.get_service_address(client, 'routing-service') is None:
+        client.create_namespaced_service(namespace=util.NAMESPACE,
+                                         body=service_spec)
 
     print('Adding %d scheduler nodes...' % (sched_count))
     batch_add_nodes(client, apps_client, cfile, ['scheduler'], [sched_count], BATCH_SIZE, prefix)
@@ -108,8 +111,9 @@ def create_cluster(mem_count, ebs_count, func_count, sched_count, route_count,
 
     print('Creating function service...')
     service_spec = util.load_yaml('yaml/services/function.yml', prefix)
-    client.create_namespaced_service(namespace=util.NAMESPACE,
-                                     body=service_spec)
+    if util.get_service_address(client, 'function-service') is None:
+        client.create_namespaced_service(namespace=util.NAMESPACE,
+                                         body=service_spec)
 
     print('Adding %d benchmark nodes...' % (bench_count))
     batch_add_nodes(client, apps_client, cfile, ['benchmark'], [bench_count], BATCH_SIZE, prefix)
