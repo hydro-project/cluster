@@ -5,6 +5,8 @@ To run Hydro in cluster mode (i.e., on multiple nodes and with autoscaling enabl
 ### Prerequisites
 
 We assume you are running inside an EC2 linux VM on AWS, where you have Python3 installed (preferably Python3.6 or later -- we have not tested with earlier versions).
+AWS has default quotas on resources that can be allocated for accounts. The cluster to create in this doc will exceed the default vCPU limit(32) for a regular AWS account. Please make sure this limit is lifted before proceeding. 
+[read more](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html). 
 
 ### Step 0: Installing the Hydro project repositories on your VM
 
@@ -30,11 +32,13 @@ cd cluster
 * Install the `kubectl` binary using the Kubernetes documentation, found [here](https://kubernetes.io/docs/tasks/tools/install-kubectl). Don't worry about setting up your kubectl configuration yet.
 * Install the `kops` binary -- documentation found [here](https://github.com/kubernetes/kops/blob/master/docs/install.md)
 * Install a variety of Python dependencies: `pip3 install awscli boto3 kubernetes`<sup>1</sup>
+* Download and install the AWS CLI [here](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html).
 
 ### Step 2: Configuring `kops`
 
 * `kops` requires an IAM group and user with permissions to access EC2, Route53, etc. You can find the commands to create these permissions [here](https://github.com/kubernetes/kops/blob/master/docs/getting_started/aws.md#aws). Make sure that you capture the Access Key ID and Secret Access Key for the `kops` IAM user and set them as environmnent variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) and pass them into `aws configure`, as described in the above link.
 * `kops` also requires an S3 bucket for state storage. More information about configuring this bucket can be found [here](https://github.com/kubernetes/kops/blob/master/docs/getting_started/aws.md#cluster-state-storage).
+* Create a service linked role for the Elastic Load Balancer (ELB) service: `aws iam create-service-linked-role --aws-service-name "elasticloadbalancing.amazonaws.com"`. Hydro uses ELBs as the entrypoint to the system for both Anna and Cloudburst.
 * Finally, in order to access the cluster, you will need a domain name<sup>2</sup> to point to. Currently, we have only tested our setup scripts with domain names registered in Route53. `kops` supports a variety of DNS settings, which you can find more information about [here](https://github.com/kubernetes/kops/blob/master/docs/getting_started/aws.md#configure-dns). If you would like help with running using other DNS settings and run into any challenges, please please [open an issue](https://github.com/hydro-project/cluster/issues/new), and we'd be happy to help debug.
 
 ### Step 3: Odds and ends
