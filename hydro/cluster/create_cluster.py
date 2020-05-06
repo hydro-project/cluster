@@ -195,7 +195,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--scheduler', nargs=1, type=int, metavar='S',
                         help='The number of scheduler nodes to start with ' +
                         '(required)', dest='scheduler', required=True)
-    parser.add_argument('-g', '--gpu', nargs=1, type=int, metavar='G',
+    parser.add_argument('-g', '--gpu', nargs='?', type=int, metavar='G',
                         help='The number of GPU nodes to start with ' +
                         '(optional)', dest='gpu', default=0)
     parser.add_argument('-e', '--ebs', nargs='?', type=int, metavar='E',
@@ -222,7 +222,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    create_cluster(args.memory[0], args.ebs, args.function[0], args.gpu[0],
+    create_cluster(args.memory[0], args.ebs, args.function[0], args.gpu,
                    args.scheduler[0], args.routing[0], args.benchmark,
                    args.conf, args.sshkey, cluster_name, kops_bucket,
                    aws_key_id, aws_key)
