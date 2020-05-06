@@ -26,9 +26,9 @@ BATCH_SIZE = 100
 
 ec2_client = boto3.client('ec2', os.getenv('AWS_REGION', 'us-east-1'))
 
-def create_cluster(mem_count, ebs_count, func_count, sched_count, route_count,
-                   bench_count, cfile, ssh_key, cluster_name, kops_bucket,
-                   aws_key_id, aws_key):
+def create_cluster(mem_count, ebs_count, func_count, gpu_count, sched_count,
+                   route_count, bench_count, cfile, ssh_key, cluster_name,
+                   kops_bucket, aws_key_id, aws_key):
 
     if 'HYDRO_HOME' not in os.environ:
         raise ValueError('HYDRO_HOME environment variable must be set to be '
@@ -54,6 +54,21 @@ def create_cluster(mem_count, ebs_count, func_count, sched_count, route_count,
     # Waits until the management pod starts to move forward -- we need to do
     # this because other pods depend on knowing the management pod's IP address.
     management_ip = util.get_pod_ips(client, 'role=management', is_running=True)[0]
+
+    # Create the NVidia kubernetes plugin DaemonSet that enables GPU accesses.
+    nvidia_ds_exists = True
+    try:
+        apps_client.read_namespaced_daemon_set('nvidia-device-plugin-daemonset', namespace='kube-system')
+    except: # Throws an error if the DS doesnt' exist.
+        nvidia_ds_exists = False
+
+    if not nvidia_ds_exists:
+        os.system('wget https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/1.0.0-beta5/nvidia-device-plugin.yml > /dev/null 2>&1')
+
+        ds_spec = util.load_yaml('nvidia-device-plugin.yml')
+        apps_client.create_namespaced_daemon_set(namespace='kube-system', body=ds_spec)
+
+        os.system('rm nvidia-device-plugin.yml')
 
     # Copy kube config file to management pod, so it can execute kubectl
     # commands, in addition to SSH keys and KVS config.
@@ -92,7 +107,9 @@ def create_cluster(mem_count, ebs_count, func_count, sched_count, route_count,
 
     print('Creating %d memory, %d ebs node(s)...' %
           (mem_count, ebs_count))
-    batch_add_nodes(client, apps_client, cfile, ['memory', 'ebs'], [mem_count, ebs_count], BATCH_SIZE, prefix)
+    batch_add_nodes(client, apps_client, cfile, ['memory', 'ebs'], [mem_count,
+                                                                    ebs_count],
+                    BATCH_SIZE, prefix)
 
     print('Creating routing service...')
     service_spec = util.load_yaml('yaml/services/routing.yml', prefix)
@@ -103,11 +120,13 @@ def create_cluster(mem_count, ebs_count, func_count, sched_count, route_count,
                                          body=service_spec)
 
     print('Adding %d scheduler nodes...' % (sched_count))
-    batch_add_nodes(client, apps_client, cfile, ['scheduler'], [sched_count], BATCH_SIZE, prefix)
+    batch_add_nodes(client, apps_client, cfile, ['scheduler'], [sched_count],
+                    BATCH_SIZE, prefix)
     util.get_pod_ips(client, 'role=scheduler')
 
-    print('Adding %d function serving nodes...' % (func_count))
-    batch_add_nodes(client, apps_client, cfile, ['function'], [func_count], BATCH_SIZE, prefix)
+    print('Adding %d function, %d GPU nodes...' % (func_count, gpu_count))
+    batch_add_nodes(client, apps_client, cfile, ['function', 'gpu'],
+                    [func_count, gpu_count], BATCH_SIZE, prefix)
 
     print('Creating function service...')
     service_spec = util.load_yaml('yaml/services/function.yml', prefix)
@@ -116,7 +135,8 @@ def create_cluster(mem_count, ebs_count, func_count, sched_count, route_count,
                                          body=service_spec)
 
     print('Adding %d benchmark nodes...' % (bench_count))
-    batch_add_nodes(client, apps_client, cfile, ['benchmark'], [bench_count], BATCH_SIZE, prefix)
+    batch_add_nodes(client, apps_client, cfile, ['benchmark'], [bench_count],
+                    BATCH_SIZE, prefix)
 
     print('Finished creating all pods...')
     os.system('touch setup_complete')
@@ -175,6 +195,9 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--scheduler', nargs=1, type=int, metavar='S',
                         help='The number of scheduler nodes to start with ' +
                         '(required)', dest='scheduler', required=True)
+    parser.add_argument('-g', '--gpu', nargs=1, type=int, metavar='G',
+                        help='The number of GPU nodes to start with ' +
+                        '(optional)', dest='gpu', default=0)
     parser.add_argument('-e', '--ebs', nargs='?', type=int, metavar='E',
                         help='The number of EBS nodes to start with ' +
                         '(optional)', dest='ebs', default=0)
@@ -199,7 +222,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    create_cluster(args.memory[0], args.ebs, args.function[0],
+    create_cluster(args.memory[0], args.ebs, args.function[0], args.gpu[0],
                    args.scheduler[0], args.routing[0], args.benchmark,
                    args.conf, args.sshkey, cluster_name, kops_bucket,
                    aws_key_id, aws_key)

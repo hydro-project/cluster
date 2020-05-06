@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-FROM ubuntu:18.04
+FROM nvidia/cuda:10.0-base-ubuntu18.04
 
 MAINTAINER Vikram Sreekanti <vsreekanti@gmail.com> version: 0.1
 
@@ -78,5 +78,11 @@ RUN git clone --recurse-submodules https://github.com/hydro-project/anna
 RUN git clone --recurse-submodules https://github.com/hydro-project/anna-cache
 RUN git clone --recurse-submodules https://github.com/hydro-project/cloudburst
 RUN git clone --recurse-submodules https://github.com/hydro-project/cluster
+
+WORKDIR /hydro/anna
+RUN bash scripts/build.sh -j4 -bRelease
+
+# Add CUDA libray dependencies.
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install cuda
 
 WORKDIR /

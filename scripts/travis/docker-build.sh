@@ -22,6 +22,7 @@ if [[ "$TRAVIS_BRANCH" = "master" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; 
 
   cd dockerfiles
   docker build . -f hydro-base.dockerfile -t hydroproject/base
+  docker build . -f hydro-base-cuda.dockerfile -t hydroproject/base-cuda
 
   cd cluster
   docker build . -f management.dockerfile -t hydroproject/management
@@ -29,5 +30,6 @@ if [[ "$TRAVIS_BRANCH" = "master" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; 
   echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
   docker push hydroproject/base
+  docker push hydroproject/base-cuda
   docker push hydroproject/management
 fi

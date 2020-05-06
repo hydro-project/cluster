@@ -17,15 +17,18 @@ kind: InstanceGroup
 metadata:
   labels:
     kops.k8s.io/cluster: CLUSTER_NAME
-  name: routing-instances
+  name: gpu-instances
 spec:
-  image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
-  machineType: r4.2xlarge
+  image: kope.io/k8s-1.15-debian-stretch-amd64-hvm-ebs-2020-01-17
+  hooks:
+  - execContainer:
+      image: hydroproject/nvidia-device-plugin:0.2.0-cuda10.0
+  machineType: p2.xlarge
   maxSize: MAX_DUMMY
   minSize: MIN_DUMMY
+  rootVolumeSize: 128
   role: Node
-  rootVolumeSize: 32
   nodeLabels:
-    role: routing
+    role: gpu
   subnets:
     - us-east-1a

@@ -19,7 +19,7 @@ metadata:
     kops.k8s.io/cluster: CLUSTER_NAME
   name: misc-instances
 spec:
-  image: kope.io/k8s-1.11-debian-stretch-amd64-hvm-ebs-2018-08-17
+  image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
   machineType: m4.xlarge
   maxSize: 1
   minSize: 1

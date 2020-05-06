@@ -150,6 +150,8 @@ def run(self_ip):
             ips = StringSet()
             for ip in util.get_pod_ips(client, 'role=function'):
                 ips.keys.append(ip)
+            for ip in util.get_pod_ips(client, 'role=gpu'):
+                ips.keys.append(ip)
 
             sckt = pusher_cache.get(response_ip)
             sckt.send(ips.SerializeToString())

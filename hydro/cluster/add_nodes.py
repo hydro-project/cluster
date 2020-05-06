@@ -111,7 +111,7 @@ def add_nodes(client, apps_client, cfile, kinds, counts, create=False,
         os.system('cp %s ./anna-config.yml' % cfile)
 
         for pname, cname in new_pods:
-            if kind != 'function':
+            if kind != 'function' and kind != 'gpu':
                 util.copy_file_to_pod(client, 'anna-config.yml', pname,
                                       '/hydro/anna/conf/', cname)
             else:
