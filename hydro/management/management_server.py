@@ -71,7 +71,7 @@ def run(self_ip):
     statistics_socket.bind('tcp://*:7006')
 
     pin_accept_socket = context.socket(zmq.PULL)
-    pin_accept_socket.setsockopt(zmq.RCVTIMEO, 1000)
+    pin_accept_socket.setsockopt(zmq.RCVTIMEO, 10000) # 10 seconds.
     pin_accept_socket.bind('tcp://*:' + PIN_ACCEPT_PORT)
 
     poller = zmq.Poller()
@@ -158,24 +158,31 @@ def run(self_ip):
 
         if (function_status_socket in socks and
                 socks[function_status_socket] == zmq.POLLIN):
-            status = ThreadStatus()
-            status.ParseFromString(function_status_socket.recv())
+            # Dequeue all available ThreadStatus messages rather than doing
+            # them one at a time---this prevents starvation if other operations
+            # (e.g., pin) take a long time.
+            while True:
+                status = ThreadStatus()
+                try:
+                    status.ParseFromString(function_status_socket.recv(zmq.DONTWAIT))
+                except:
+                    break # We've run out of messages.
 
-            key = (status.ip, status.tid)
+                key = (status.ip, status.tid)
 
-            # If this executor is one of the ones that's currently departing,
-            # we can just ignore its status updates since we don't want
-            # utilization to be skewed downwards. The reason we might still
-            # receive this message is because the depart message may not have
-            # arrived when this was sent.
-            if key[0] in departing_executors:
-                continue
+                # If this executor is one of the ones that's currently departing,
+                # we can just ignore its status updates since we don't want
+                # utilization to be skewed downwards. The reason we might still
+                # receive this message is because the depart message may not have
+                # arrived when this was sent.
+                if key[0] in departing_executors:
+                    continue
 
-            executor_statuses[key] = status
-            logging.info(('Received thread status update from %s:%d: %.4f ' +
-                          'occupancy, %d functions pinned') %
-                         (status.ip, status.tid, status.utilization,
-                          len(status.functions)))
+                executor_statuses[key] = status
+                logging.info(('Received thread status update from %s:%d: %.4f ' +
+                              'occupancy, %d functions pinned') %
+                             (status.ip, status.tid, status.utilization,
+                              len(status.functions)))
 
         if (list_schedulers_socket in socks and
                 socks[list_schedulers_socket] == zmq.POLLIN):

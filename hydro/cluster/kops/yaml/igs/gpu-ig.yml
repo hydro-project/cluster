@@ -23,7 +23,7 @@ spec:
   hooks:
   - execContainer:
       image: hydroproject/nvidia-device-plugin:0.2.0-cuda10.0
-  machineType: p2.xlarge
+  machineType: g4dn.xlarge
   maxSize: MAX_DUMMY
   minSize: MIN_DUMMY
   rootVolumeSize: 128

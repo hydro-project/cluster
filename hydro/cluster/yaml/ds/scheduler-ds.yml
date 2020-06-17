@@ -50,3 +50,5 @@ spec:
           value: hydro-project
         - name: ANNA_REPO_BRANCH
           value: master
+        - name: POLICY
+          value: locality

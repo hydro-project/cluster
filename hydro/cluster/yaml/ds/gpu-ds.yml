@@ -42,7 +42,6 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
-            memory: 3072Mi
             nvidia.com/gpu: 1
         env:
         - name: ROUTE_ADDR
@@ -65,62 +64,6 @@ spec:
           value: master
         - name: EXECUTOR_TYPE
           value: "GPU"
-        volumeMounts:
-        - mountPath: /requests
-          name: ipc
-      - name: function-2
-        image: hydroproject/cloudburst
-        imagePullPolicy: Always
-        resources:
-          limits:
-            memory: 3072Mi
-        env:
-        - name: ROUTE_ADDR
-          value: ROUTE_ADDR_DUMMY
-        - name: MGMT_IP
-          value: MGMT_IP_DUMMY
-        - name: SCHED_IPS
-          value: SCHED_IPS_DUMMY
-        - name: THREAD_ID
-          value: "1"
-        - name: ROLE
-          value: executor
-        - name: REPO_ORG
-          value: hydro-project
-        - name: REPO_BRANCH
-          value: master
-        - name: ANNA_REPO_ORG
-          value: hydro-project
-        - name: ANNA_REPO_BRANCH
-          value: master
-        volumeMounts:
-        - mountPath: /requests
-          name: ipc
-      - name: function-3
-        image: hydroproject/cloudburst
-        imagePullPolicy: Always
-        resources:
-          limits:
-            memory: 3072Mi
-        env:
-        - name: ROUTE_ADDR
-          value: ROUTE_ADDR_DUMMY
-        - name: MGMT_IP
-          value: MGMT_IP_DUMMY
-        - name: SCHED_IPS
-          value: SCHED_IPS_DUMMY
-        - name: THREAD_ID
-          value: "2"
-        - name: ROLE
-          value: executor
-        - name: REPO_ORG
-          value: hydro-project
-        - name: REPO_BRANCH
-          value: master
-        - name: ANNA_REPO_ORG
-          value: hydro-project
-        - name: ANNA_REPO_BRANCH
-          value: master
         volumeMounts:
         - mountPath: /requests
           name: ipc

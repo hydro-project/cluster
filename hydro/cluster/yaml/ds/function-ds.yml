@@ -38,6 +38,10 @@ spec:
       hostIPC: true
       containers:
       - name: function-1
+        resources:
+          limits:
+            cpu: "2"
+            memory: "2G"
         image: hydroproject/cloudburst
         imagePullPolicy: Always
         env:
@@ -63,6 +67,10 @@ spec:
         - mountPath: /requests
           name: ipc
       - name: function-2
+        resources:
+          limits:
+            cpu: "2"
+            memory: "2G"
         image: hydroproject/cloudburst
         imagePullPolicy: Always
         env:
@@ -90,6 +98,10 @@ spec:
       - name: function-3
         image: hydroproject/cloudburst
         imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: "2"
+            memory: "2G"
         env:
         - name: ROUTE_ADDR
           value: ROUTE_ADDR_DUMMY
@@ -115,6 +127,10 @@ spec:
       - name: cache-container
         image: hydroproject/anna-cache
         imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 1
+            memory: "8G"
         env:
         - name: ROUTE_ADDR
           value: ROUTE_ADDR_DUMMY

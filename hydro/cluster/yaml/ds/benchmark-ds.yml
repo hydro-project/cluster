@@ -29,6 +29,7 @@ spec:
     spec:
       nodeSelector:
         role: benchmark
+      hostNetwork: true
       containers:
       - name: benchmark-1
         image: hydroproject/cloudburst
